@@ -40,7 +40,14 @@ const App = () => {
     if (counter == 0) {
       setNumber(nextQuestion)
     } else if ((nextQuestion === TOTAL_QUESTIONS)) {
-      setEnd(true)
+      setEnd(true);
+      if (score > 4) {
+        window.location.href = `/success/${score}`
+      } else {
+        window.location.href = `/failure/${score}`
+      }
+    } else if (userAnswers.length === number + 1 && number !== TOTAL_QUESTIONS -1) {
+      setNumber(number)
     }
     if (counter === 0) setCounter(10)
     
@@ -83,6 +90,12 @@ const App = () => {
    
     if (nextQuestion === TOTAL_QUESTIONS) {
       setEnd(true);
+      if (score > 4) {
+        window.location.href = `/success/${score}`
+      } else {
+        window.location.href = `/failure/${score}`
+      }
+      
       score > 4 ? setPass(true) : setPass(false) 
     } 
     else {
