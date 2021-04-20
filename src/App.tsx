@@ -1,16 +1,24 @@
 import React, {useState} from 'react';
+import Countdown from 'react-countdown';
 import QuestionCard from './components/QuestionCard';
 import {fetchQuestions} from "./API"
 import { type } from 'node:os';
 import {Style, Wrapper} from "./App.styles"
 
 import  {QuestionState, Difficulty} from "./API"
+import { truncate } from 'node:fs';
 
 export type AnswerObject = {
   question: string;
   answer: string;
   correct: boolean;
-  correctAnswer: string
+  correctAnswer: string;
+
+}
+
+type ResultObject = {
+  pass: string;
+  fail: string;
 }
 
 const TOTAL_QUESTIONS = 10;
@@ -22,8 +30,23 @@ const App = () => {
   const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([]);
   const [score, setScore] = useState(0);
   const [end, setEnd] = useState(true);
+  const [pass, setPass] = useState(false); 
+  const [counter, setCounter] = React.useState(10);
+  
 
-  console.log(questions)
+  React.useEffect(() => {
+    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
+    const nextQuestion = number + 1;
+    if (counter == 0) {
+      setNumber(nextQuestion)
+    } else if ((nextQuestion === TOTAL_QUESTIONS)) {
+      setEnd(true)
+    }
+    if (counter === 0) setCounter(10)
+    
+  }, [counter]);
+
+ 
 
   const startQuiz = async () => {
     setLoading(true);
@@ -36,6 +59,7 @@ const App = () => {
     setUserAnswers([])
       setNumber(0)
       setLoading(false)
+     
 
   }
 
@@ -56,21 +80,25 @@ const App = () => {
 
   const nextQuestion = () => {
     const nextQuestion = number + 1;
+   
     if (nextQuestion === TOTAL_QUESTIONS) {
       setEnd(true);
-    } else {
+      score > 4 ? setPass(true) : setPass(false) 
+    } 
+    else {
       setNumber(nextQuestion)
     }
   }
+
   return (
     <>
     <Style/>
     <Wrapper>
      <h1>QUIZ APP</h1>
-     {end || userAnswers.length === TOTAL_QUESTIONS ? <button className="start" onClick={startQuiz}>Start</button> : null}
-     {!end ? <p className="score">Score: {score} out of {TOTAL_QUESTIONS}</p> : null}
+     {end || userAnswers.length === TOTAL_QUESTIONS ? <button className="start" onClick={startQuiz}>Start</button> : <button className="countdown">{counter}</button>}
+     {!end ? <p className="score">Score: {score * 100 / TOTAL_QUESTIONS}% {score > 4 ? <span>Pass</span> : null}</p> : <p>You must score up to 50% for a pass</p>}
      {loading && <p>Loading Questions...</p>}
-   { !loading && !end && 
+   { !loading && !end &&
    <QuestionCard 
       questionNr={number + 1}
       totalQuestions={TOTAL_QUESTIONS}
@@ -78,7 +106,9 @@ const App = () => {
       answers={questions[number].answers}
       userAnswer={userAnswers ? userAnswers[number] : undefined}
       callback={checkAnswer}
-     />}
+     />} 
+    
+     
      {!end && !loading && userAnswers.length === number + 1 && number !== TOTAL_QUESTIONS -1 ? <button className="next" onClick={nextQuestion}>Next Question</button> : null}
     </Wrapper>
     </>
