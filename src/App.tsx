@@ -31,28 +31,14 @@ const App = () => {
   const [score, setScore] = useState(0);
   const [end, setEnd] = useState(true);
   const [pass, setPass] = useState(false); 
-  const [start, setStart] = useState(false);
-  const [counter, setCounter] = React.useState(60);
+  const [counter, setCounter] = React.useState(100);
   
 
   React.useEffect(() => {
-    
-    
-    
-    
-  }, [counter]);
-
-  const startTimer = () => {
-    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000) 
-    
+    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
     const nextQuestion = number + 1;
     if (counter == 0) {
       setEnd(true)
-      if (score > 4) {
-        window.location.href = `/success/${score}`
-      } else {
-        window.location.href = `/failure/${score}`
-      }
     } else if ((nextQuestion === TOTAL_QUESTIONS)) {
       setEnd(true);
       if (score > 4) {
@@ -60,26 +46,24 @@ const App = () => {
       } else {
         window.location.href = `/failure/${score}`
       }
-     
     } 
-  }
+    
+    
+  }, [counter]);
 
-
+ 
 
   const startQuiz = async () => {
     setLoading(true);
     setEnd(false);
-    
+
     const newQuestions = await fetchQuestions(TOTAL_QUESTIONS, Difficulty.EASY)
 
     setQuestions(newQuestions)
-    startTimer()
     setScore(0)
     setUserAnswers([])
       setNumber(0)
       setLoading(false)
-      setStart(true)
-    
      
 
   }
@@ -122,8 +106,7 @@ const App = () => {
     <Style/>
     <Wrapper>
      <h1>QUIZ APP</h1>
-     {end || userAnswers.length === TOTAL_QUESTIONS ? <button className="start" onClick={startQuiz}>Start</button> : null}
-     {start ? <button className="countdown">{counter}</button> : null}
+     {end || userAnswers.length === TOTAL_QUESTIONS ? <button className="start" onClick={startQuiz}>Start</button> : <button className="countdown">{counter}</button>}
      {!end ? <p className="score">Score: {score * 100 / TOTAL_QUESTIONS}% {score > 4 ? <span>Pass</span> : null}</p> : <p>You must score up to 50% for a pass</p>}
      {loading && <p>Loading Questions...</p>}
    { !loading && !end &&
