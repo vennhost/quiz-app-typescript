@@ -31,14 +31,28 @@ const App = () => {
   const [score, setScore] = useState(0);
   const [end, setEnd] = useState(true);
   const [pass, setPass] = useState(false); 
-  const [counter, setCounter] = React.useState(10);
+  const [start, setStart] = useState(false);
+  const [counter, setCounter] = React.useState(60);
   
 
   React.useEffect(() => {
-    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
+    
+    
+    
+    
+  }, [counter]);
+
+  const startTimer = () => {
+    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000) 
+    
     const nextQuestion = number + 1;
     if (counter == 0) {
-      setNumber(nextQuestion)
+      setEnd(true)
+      if (score > 4) {
+        window.location.href = `/success/${score}`
+      } else {
+        window.location.href = `/failure/${score}`
+      }
     } else if ((nextQuestion === TOTAL_QUESTIONS)) {
       setEnd(true);
       if (score > 4) {
@@ -46,26 +60,26 @@ const App = () => {
       } else {
         window.location.href = `/failure/${score}`
       }
-    } else if (userAnswers.length === number + 1 && number !== TOTAL_QUESTIONS -1) {
-      setNumber(number)
-    }
-    if (counter === 0) setCounter(10)
-    
-  }, [counter]);
+     
+    } 
+  }
 
- 
+
 
   const startQuiz = async () => {
     setLoading(true);
     setEnd(false);
-
+    
     const newQuestions = await fetchQuestions(TOTAL_QUESTIONS, Difficulty.EASY)
 
     setQuestions(newQuestions)
+    startTimer()
     setScore(0)
     setUserAnswers([])
       setNumber(0)
       setLoading(false)
+      setStart(true)
+    
      
 
   }
@@ -108,7 +122,8 @@ const App = () => {
     <Style/>
     <Wrapper>
      <h1>QUIZ APP</h1>
-     {end || userAnswers.length === TOTAL_QUESTIONS ? <button className="start" onClick={startQuiz}>Start</button> : <button className="countdown">{counter}</button>}
+     {end || userAnswers.length === TOTAL_QUESTIONS ? <button className="start" onClick={startQuiz}>Start</button> : null}
+     {start ? <button className="countdown">{counter}</button> : null}
      {!end ? <p className="score">Score: {score * 100 / TOTAL_QUESTIONS}% {score > 4 ? <span>Pass</span> : null}</p> : <p>You must score up to 50% for a pass</p>}
      {loading && <p>Loading Questions...</p>}
    { !loading && !end &&
